@@ -1,0 +1,72 @@
+﻿@model Artist
+
+<form method="post">
+    <div class="card shadow border-0 mt-4 mb-4">
+        <div class="card-header bg-secondary bg-gradient text-light py-4">
+            <div class="row">
+                <div class="col-12 text-center">
+                    <h3 class="text-dark text-uppercase">@Model.ArtistName</h3>
+                    <p class="text-dark fw-semibold mb-0">From @Model.Country</p>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="py-3">
+                <div class="row">
+                    <div class="col-12 col-lg-3 offset-lg-1 text-center mb-3">
+                        <img src="@Model.ImageUrl" width="100%" class="rounded" />
+                    </div>
+                    <div class="col-12 col-lg-6 offset-lg-1">
+
+                        <div class="row pl-2 my-3">
+                            <p class="text-secondary lh-sm">@Html.Raw(Model.Description)</p>
+                        </div>
+                        
+                    </div>
+
+                </div>
+
+                <div>
+                    @if (Model.Albums != null)
+                    {
+                        <h2>Albums List</h2>
+                        <table id="tblData" class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Released</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                @foreach (var album in Model.Albums)
+                                {
+                                    <tr>
+                                        <td>@album.AlbumTitle</td>
+                                        <td>@album.ReleaseDate</td>
+                                        <td>
+                                            <div>
+                                                <a asp-controller="Album" asp-action="Upsert" asp-route-id="@album.Id" class="btn btn-primary mx-2">
+                                                    <i class="bi bi-pencil-square"></i> Edit
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                </div>
+
+                <div class="row">
+                    <div class="col-6 col-md-2 offset-lg-1 pb-1">
+                        <a asp-action="Index" class="btn btn-outline-primary bg-gradient mb-5 fw-semibold btn-sm text-uppercase">
+                            <small>Back to home</small>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

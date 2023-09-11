@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using System.ComponentModel.DataAnnotations;
 
 namespace MusicApp.Models
 {
@@ -6,10 +7,15 @@ namespace MusicApp.Models
     {
         [Key]
         public Guid Id { get; set; }
+        [Required]
         public string ArtistName { get; set; }
+        [ValidateNever]
+        public string? ImageUrl { get; set; }
         public string Country { get; set; }
-        public string Description { get; set; }
-        public List<Album> Albums { get; set; }
+        [ValidateNever]
+        public string? Description { get; set; }
+        [ValidateNever]
+        public List<Album>? Albums { get; set; }
 
     }
 }

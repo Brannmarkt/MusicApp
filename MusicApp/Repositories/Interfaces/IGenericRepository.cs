@@ -1,11 +1,14 @@
-﻿namespace MusicApp.Repositories.Interfaces
+﻿using Microsoft.AspNetCore.Mvc;
+using System.Linq.Expressions;
+
+namespace MusicApp.Repositories.Interfaces
 {
     public interface IGenericRepository<T> where T : class
     {
-        Task<IEnumerable<T>> GetAllAsync();
-        Task<T?> GetById(int id);
-        Task<bool> Add(T entity);
-        Task<bool> Update(T entity);
-        Task<bool> Delete(T entity);
+        IEnumerable<T> GetAll(string? includeProperties = null);
+        T Get(Expression<Func<T, bool>> filter, string? includeProperties = null);
+        void Add(T entity);
+        void Update(T entity);
+        void Delete(T entity);
     }
 }

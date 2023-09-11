@@ -1,0 +1,107 @@
+﻿@using MusicApp.Models.ViewModels
+
+@model ArtistViewModel
+
+<div class="card shadow border-0 mt-4">
+    <div class="card-header bg-secondary bg-gradient ml-0 py-3">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h2 class="text-dark py-2">@(Model.Artist.Id != Guid.Empty ? "Update" : "Create") Artist</h2>
+            </div>
+        </div>
+    </div>
+    <div class="card-body p-4">
+        <form method="post" class="row" enctype="multipart/form-data">
+            <input asp-for="Artist.Id" hidden />
+            <input asp-for="Artist.ImageUrl" hidden />
+
+            <div class="row">
+                <div class="col-10">
+                    <div class="border p-3">
+                        <div class="form-floating py-2 col-12">
+                            <input asp-for="Artist.ArtistName" class="form-control border-0 shadow" />
+                            <label asp-for="Artist.ArtistName" class="ms-2"></label>
+                            <span asp-validation-for="Artist.ArtistName" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-floating py-2 col-12">
+                            <input asp-for="Artist.Country" class="form-control border-0 shadow" />
+                            <label asp-for="Artist.Country" class="ms-2"></label>
+                            <span asp-validation-for="Artist.Country" class="text-danger"></span>
+                        </div>
+
+                        <div class="py-2 col-12">
+                            <label asp-for="Artist.Description" class="ms-2 text-muted"></label>
+                            <textarea asp-for="Artist.Description" class="form-control border-0 shadow"></textarea>
+
+                        </div>
+
+                        <div class="form-floating py-2 col-12">
+                            <input type="file" name="file" asp-for="Artist.ImageUrl" class="form-control border-0 shadow" />
+                            <label asp-for="Artist.ImageUrl" class="ms-2"></label>
+                        </div>
+
+                        @if(Model.Artist.Albums != null)
+                        {
+                            <h2>Albums List</h2>
+                            <table id="tblData" class="table table-bordered table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Title</th>
+                                        <th>Released</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    @foreach (var album in Model.Artist.Albums)
+                                    {
+                                        <tr>
+                                            <td>@album.AlbumTitle</td>
+                                            <td>@album.ReleaseDate</td>
+                                            <td>
+                                                <div>
+                                                    <a asp-route-id="@album.ArtistId" asp-controller="Album" asp-action="Upsert" class="btn btn-primary mx-2">
+                                                        <i class="bi bi-pencil-square"></i> Edit
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        }
+                        
+                        <div>
+                            <a asp-route-id="@Model.Artist.Id" asp-controller="Album" asp-action="Upsert" class="btn btn-primary mx-2">
+                                Add New Album
+                            </a>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col-6 col-md-3">
+                                @if (Model.Artist.Id != Guid.Empty)
+                                {
+                                    <button type="submit" class="btn btn-primary form-control">Update</button>
+                                }
+                                else 
+                                {
+                                    <button type="submit" class="btn btn-primary form-control">Create</button>
+                                }
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <a asp-controller="Artist" asp-action="Index" class="btn btn-outline-primary border  form-control">
+                                    Back to List
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-2">
+                    <img src="@Model.Artist.ImageUrl" width="100%"
+                         style="border-radius:5px; border:1px solid #bbb9b9" />
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
