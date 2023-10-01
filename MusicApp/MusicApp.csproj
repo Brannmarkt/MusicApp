@@ -21,7 +21,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Views\Song\" />
     <Folder Include="wwwroot\images\artists\" />
     <Folder Include="wwwroot\images\albums\" />
   </ItemGroup>

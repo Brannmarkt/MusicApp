@@ -86,8 +86,10 @@ namespace MusicApp.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<byte[]>("Content")
-                        .IsRequired()
                         .HasColumnType("varbinary(max)");
+
+                    b.Property<string>("ContentType")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Lyrics")
                         .HasColumnType("nvarchar(max)");

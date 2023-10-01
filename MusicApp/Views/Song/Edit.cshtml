@@ -1,0 +1,63 @@
+﻿@using MusicApp.Models.ViewModels
+
+@model SongViewModel
+
+<div class="card shadow border-0 mt-4">
+    <div class="card-header bg-secondary bg-gradient ml-0 py-3">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h2 class="text-dark py-2">Update Song</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-body p-4">
+        <form method="post" class="row" enctype="multipart/form-data">
+            <input asp-for="Song.Id" hidden />
+            
+            <input asp-for="Song.AlbumId" hidden />
+
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="row">
+                <div class="col-10">
+                    <div class="border p-3">
+                        <div class="form-floating py-2 col-12">
+                            <input asp-for="Song.SongTitle" class="form-control border-0 shadow" />
+                            <label asp-for="Song.SongTitle" class="ms-2"></label>
+                            <span asp-validation-for="Song.SongTitle" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-floating py-2 col-12">
+                            <input type="file" name="file" asp-for="Song.Content" class="form-control border-0 shadow" />
+                            <label asp-for="Song.Content" class="ms-2"></label>
+                        </div>
+
+                        <div class="py-2 col-12">
+                            <label asp-for="Song.Lyrics" class="ms-2 text-muted"></label>
+                            <textarea asp-for="Song.Lyrics" class="form-control border-0 shadow"></textarea>
+
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col-6 col-md-3">
+
+                                <button type="submit" class="btn btn-primary form-control">Update</button>
+
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <a asp-controller="Artist" asp-action="Index" class="btn btn-outline-primary border  form-control">
+                                    Back to List
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts{
+    <partial name="_ValidationScriptsPartial" />
+}

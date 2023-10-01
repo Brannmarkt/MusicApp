@@ -61,8 +61,12 @@
                                             <td>@album.ReleaseDate</td>
                                             <td>
                                                 <div>
-                                                    <a asp-route-id="@album.ArtistId" asp-controller="Album" asp-action="Upsert" class="btn btn-primary mx-2">
+                                                    <a asp-route-id="@album.Id" asp-controller="Album" asp-action="Edit" class="btn btn-primary mx-2">
                                                         <i class="bi bi-pencil-square"></i> Edit
+                                                    </a>
+
+                                                    <a asp-route-id="@album.Id" asp-controller="Album" asp-action="Delete" class="btn btn-danger mx-2">
+                                                        <i class="bi bi-trash-fill"></i> Delete
                                                     </a>
                                                 </div>
                                             </td>
@@ -73,7 +77,7 @@
                         }
                         
                         <div>
-                            <a asp-route-id="@Model.Artist.Id" asp-controller="Album" asp-action="Upsert" class="btn btn-primary mx-2">
+                            <a asp-route-id="@Model.Artist.Id" asp-controller="Album" asp-action="Create" class="btn btn-primary mx-2">
                                 Add New Album
                             </a>
                         </div>
@@ -105,3 +109,7 @@
         </form>
     </div>
 </div>
+
+@section Scripts{
+    <partial name="_ValidationScriptsPartial" />
+}

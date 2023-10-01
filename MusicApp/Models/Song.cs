@@ -12,10 +12,13 @@ namespace MusicApp.Models
         public string SongTitle { get; set; }
         [ValidateNever]
         public string? Lyrics { get; set; }
-        public byte[] Content { get; set; }
-
+        [ValidateNever]
+        public byte[]? Content { get; set; }
+        [ValidateNever]
+        public string? ContentType { get; set; }
         public Guid AlbumId { get; set; }
         [ForeignKey("AlbumId")]
+        [ValidateNever]
         public Album Album { get; set; }
 
     }

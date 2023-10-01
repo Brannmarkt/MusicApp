@@ -8,7 +8,7 @@ namespace MusicApp.Models
     {
         [Key]
         public Guid Id { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Title is required")]
         public string AlbumTitle { get; set; }
         public DateTime ReleaseDate { get; set; }
         [ValidateNever]

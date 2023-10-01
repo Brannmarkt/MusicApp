@@ -7,10 +7,11 @@ namespace MusicApp.Models
     {
         [Key]
         public Guid Id { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Name is required")]
         public string ArtistName { get; set; }
         [ValidateNever]
         public string? ImageUrl { get; set; }
+        [Required(ErrorMessage = "Country is required")]
         public string Country { get; set; }
         [ValidateNever]
         public string? Description { get; set; }

@@ -1,0 +1,125 @@
+﻿@using MusicApp.Models.ViewModels
+
+@model AlbumViewModel
+
+<div class="card shadow border-0 mt-4">
+    <div class="card-header bg-secondary bg-gradient ml-0 py-3">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h2 class="text-dark py-2">Update Album</h2>
+            </div>
+        </div>
+    </div>
+    <div class="card-body p-4">
+        <form method="post" class="row" enctype="multipart/form-data">
+            <input asp-for="Album.Id" hidden />
+            <input asp-for="Album.ImageUrl" hidden />
+            <input asp-for="Album.ArtistId" hidden />
+            
+
+            <div class="row">
+                <div class="col-10">
+                    <div class="border p-3">
+                        <div class="form-floating py-2 col-12">
+                            <input asp-for="Album.AlbumTitle" class="form-control border-0 shadow" />
+                            <label asp-for="Album.AlbumTitle" class="ms-2"></label>
+                            <span asp-validation-for="Album.AlbumTitle" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-floating py-2 col-12">
+                            <input asp-for="Album.ReleaseDate" class="form-control border-0 shadow" />
+                            <label asp-for="Album.ReleaseDate" class="ms-2"></label>
+                            <span asp-validation-for="Album.ReleaseDate" class="text-danger"></span>
+                        </div>
+
+                        <div class="py-2 col-12">
+                            <label asp-for="Album.Description" class="ms-2 text-muted"></label>
+                            <textarea asp-for="Album.Description" class="form-control border-0 shadow"></textarea>
+
+                        </div>
+
+                        <div class="form-floating py-2 col-12">
+                            <input type="file" name="file" asp-for="Album.ImageUrl" class="form-control border-0 shadow" />
+                            <label asp-for="Album.ImageUrl" class="ms-2"></label>
+                        </div>
+
+                        @if (Model.Album.Songs != null)
+                        {
+                            <h2>Songs List</h2>
+                            <table id="tblData" class="table table-bordered table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Title</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    @foreach (var song in Model.Album.Songs)
+                                    {
+                                        <tr>
+                                            <td>@song.SongTitle</td>
+                                            @if(song.Content != null)
+                                            {
+                                                <td>
+                                                    <label class="item">
+                                                        <audio controls>
+                                                            <source src="data:video/mp4;base64,@Convert.ToBase64String(song.Content, 0, song.Content.Length)" type="audio/mpeg" />
+                                                            Your browser does not support the audio element
+                                                        </audio>
+                                                    </label>
+                                                </td>
+                                            }
+                                            <td>
+                                                <div>
+                                                    <a asp-controller="Song" asp-action="Details" asp-route-id="@song.Id" class="btn btn-primary mx-2">
+                                                        <i class="bi bi-pencil-square"></i> Details
+                                                    </a>
+
+                                                    <a asp-controller="Song" asp-action="Edit" asp-route-id="@song.Id" class="btn btn-primary mx-2">
+                                                        <i class="bi bi-pencil-square"></i> Edit
+                                                    </a>
+
+                                                    <a asp-controller="Song" asp-action="Delete" asp-route-id="@song.Id" class="btn btn-danger mx-2">
+                                                        <i class="bi bi-trash-fill"></i> Delete
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        }
+
+                        <div>
+                            <a asp-route-id="@Model.Album.Id" asp-controller="Song" asp-action="Create" class="btn btn-primary mx-2">
+                                Add New Song
+                            </a>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col-6 col-md-3">
+                                
+                                <button type="submit" class="btn btn-primary form-control">Update</button>
+
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <a asp-controller="Artist" asp-action="Index" class="btn btn-outline-primary border  form-control">
+                                    Back to List
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-2">
+                    <img src="@Model.Album.ImageUrl" width="100%"
+                         style="border-radius:5px; border:1px solid #bbb9b9" />
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts{
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using MusicApp.Models;
 using MusicApp.Models.ViewModels;
 using MusicApp.Repositories.Interfaces;
@@ -18,33 +19,103 @@ namespace MusicApp.Controllers
 
         public IActionResult Index()
         {
-            
+            List<Album> albumList = _unitOfWork.Album.GetAll(includeProperties: "Songs").ToList();
+
+            return View(albumList);
+        }
+
+        public IActionResult Create(Guid id)
+        {
+            AlbumViewModel albumViewModel = new()
+            {
+                SongList = _unitOfWork.Song.GetAll().Select(u => new SelectListItem
+                {
+                    Text = u.SongTitle,
+                    Value = u.Id.ToString()
+                }),
+
+                Album = new Album()
+                {
+                    ArtistId = id,
+                }
+            };
+
+            return View(albumViewModel);
+        }
+        [HttpPost]
+        public IActionResult Create(AlbumViewModel albumViewModel, IFormFile? file)
+        {
+            if (ModelState.IsValid)
+            {
+                string wwwRootPath = _webHostEnvironment.WebRootPath;
+
+                if (file != null)
+                {
+                    string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+                    string productPath = Path.Combine(wwwRootPath, @"images\albums");
+
+                    if (!string.IsNullOrEmpty(albumViewModel.Album.ImageUrl))
+                    {
+                        //delete the old image
+                        var oldImagePath =
+                            Path.Combine(wwwRootPath, albumViewModel.Album.ImageUrl.TrimStart('\\'));
+
+                        if (System.IO.File.Exists(oldImagePath))
+                        {
+                            System.IO.File.Delete(oldImagePath);
+                        }
+                    }
+
+                    using (var fileStream = new FileStream(Path.Combine(productPath, fileName), FileMode.Create))
+                    {
+                        file.CopyTo(fileStream);
+                    }
+
+                    albumViewModel.Album.ImageUrl = @"\images\albums\" + fileName;
+                }
+
+                _unitOfWork.Album.Add(albumViewModel.Album);
+                _unitOfWork.Save();
+                TempData["success"] = "Category was created successfully";
+
+                return RedirectToAction("Index");
+            }
 
             return View();
         }
 
-        public IActionResult Upsert(Guid? id)
+        public IActionResult Edit(Guid id)
         {
-            AlbumViewModel albumViewModel = new()
+            if (id == Guid.Empty)
             {
+                return NotFound();
+            }
+
+            AlbumViewModel albumFromDb = new()
+            {
+                SongList = _unitOfWork.Song.GetAll().Select(u => new SelectListItem
+                {
+                    Text = u.SongTitle,
+                    Value = u.Id.ToString()
+                }),
+
                 Album = new Album()
                 {
-                    ArtistId = id ?? throw new ArgumentNullException(nameof(id)),
+
                 }
             };
 
-            if ((_unitOfWork.Album.Get(u => u.ArtistId == id)).Id == Guid.Empty)
+            albumFromDb.Album = _unitOfWork.Album.Get(u => u.Id == id);
+
+            if (albumFromDb == null)
             {
-                return View(albumViewModel); // create new album
+                return NotFound();
             }
-            else
-            {
-                albumViewModel.Album = _unitOfWork.Album.Get(u => u.ArtistId == id);
-                return View(albumViewModel);
-            }
+
+            return View(albumFromDb);
         }
         [HttpPost]
-        public IActionResult Upsert(AlbumViewModel albumViewModel, IFormFile file)
+        public IActionResult Edit(AlbumViewModel albumViewModel, IFormFile? file)
         {
             if(ModelState.IsValid)
             {
@@ -75,24 +146,153 @@ namespace MusicApp.Controllers
                     albumViewModel.Album.ImageUrl = @"\images\albums\" + fileName;
                 }
 
-                if (albumViewModel.Album.Id == Guid.Empty)
-                {
-                    
-                    _unitOfWork.Album.Add(albumViewModel.Album);
-                }
-                else
-                {
-                    _unitOfWork.Album.Update(albumViewModel.Album);
-                }
-
+                _unitOfWork.Album.Update(albumViewModel.Album);
                 _unitOfWork.Save();
-                TempData["success"] = "Album created successfully";
+                TempData["success"] = "Album updated successfully";
                 return RedirectToAction("Index");
             }
-            else
-            {
-                return View(albumViewModel);
-            }
+
+            return View();
         }
+
+        public IActionResult Delete(Guid? id)
+        {
+            if (id == Guid.Empty)
+            {
+                return NotFound();
+            }
+            Album? albumFromDb = _unitOfWork.Album.Get(u => u.Id == id);
+
+            if (albumFromDb == null)
+            {
+                return NotFound();
+            }
+            return View(albumFromDb);
+        }
+        [HttpPost, ActionName("Delete")]
+        public IActionResult DeletePOST(Guid? id)
+        {
+            Album? obj = _unitOfWork.Album.Get(u => u.Id == id);
+            if (obj == null)
+            {
+                return NotFound();
+            }
+
+            var oldImagePath = Path.Combine(_webHostEnvironment.WebRootPath,
+                               obj.ImageUrl.TrimStart('\\'));
+
+            if (System.IO.File.Exists(oldImagePath))
+            {
+                System.IO.File.Delete(oldImagePath);
+            }
+
+            _unitOfWork.Album.Delete(obj);
+            _unitOfWork.Save();
+            TempData["success"] = "Album was deleted successfully";
+            return RedirectToAction("Index");
+        }
+
+        public IActionResult Details(Guid? id)
+        {
+            if (id == Guid.Empty)
+            {
+                return NotFound();
+            }
+
+            AlbumViewModel albumFromDb = new()
+            {
+                SongList = _unitOfWork.Song.GetAll().Select(u => new SelectListItem
+                {
+                    Text = u.SongTitle,
+                    Value = u.Id.ToString()
+                }),
+
+                Album = new Album()
+                {
+
+                }
+            };
+
+            albumFromDb.Album = _unitOfWork.Album.Get(u => u.Id == id);
+
+            if (albumFromDb == null)
+            {
+                return NotFound();
+            }
+
+            return View(albumFromDb);
+        }
+
+        //public IActionResult Upsert(Guid? id)
+        //{
+        //    AlbumViewModel albumViewModel = new()
+        //    {
+        //        Album = new Album()
+        //        {
+        //            ArtistId = id ?? throw new ArgumentNullException(nameof(id)),
+        //        }
+        //    };
+
+        //    if (_unitOfWork.Album.Get(u => u.ArtistId == id) == null)
+        //    {
+        //        return View(albumViewModel); // create new album
+        //    }
+        //    else
+        //    {
+        //        albumViewModel.Album = _unitOfWork.Album.Get(u => u.ArtistId == id);
+        //        return View(albumViewModel);
+        //    }
+        //}
+        //[HttpPost]
+        //public IActionResult Upsert(AlbumViewModel albumViewModel, IFormFile? file)
+        //{
+        //    if(ModelState.IsValid)
+        //    {
+        //        string wwwRootPath = _webHostEnvironment.WebRootPath;
+
+        //        if (file != null)
+        //        {
+        //            string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+        //            string productPath = Path.Combine(wwwRootPath, @"images\albums");
+
+        //            if (!string.IsNullOrEmpty(albumViewModel.Album.ImageUrl))
+        //            {
+        //                //delete the old image
+        //                var oldImagePath =
+        //                    Path.Combine(wwwRootPath, albumViewModel.Album.ImageUrl.TrimStart('\\'));
+
+        //                if (System.IO.File.Exists(oldImagePath))
+        //                {
+        //                    System.IO.File.Delete(oldImagePath);
+        //                }
+        //            }
+
+        //            using (var fileStream = new FileStream(Path.Combine(productPath, fileName), FileMode.Create))
+        //            {
+        //                file.CopyTo(fileStream);
+        //            }
+
+        //            albumViewModel.Album.ImageUrl = @"\images\albums\" + fileName;
+        //        }
+
+        //        if (albumViewModel.Album.Id == Guid.Empty)
+        //        {
+
+        //            _unitOfWork.Album.Add(albumViewModel.Album);
+        //        }
+        //        else
+        //        {
+        //            _unitOfWork.Album.Update(albumViewModel.Album);
+        //        }
+
+        //        _unitOfWork.Save();
+        //        TempData["success"] = "Album created successfully";
+        //        return RedirectToAction("Index");
+        //    }
+        //    else
+        //    {
+        //        return View(albumViewModel);
+        //    }
+        //}
     }
 }

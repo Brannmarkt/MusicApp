@@ -137,7 +137,7 @@ namespace MusicApp.Controllers
 
             _unitOfWork.Artist.Delete(obj);
             _unitOfWork.Save();
-            TempData["success"] = "Product was deleted successfully";
+            TempData["success"] = "Artist was deleted successfully";
             return RedirectToAction("Index");
         }
 
