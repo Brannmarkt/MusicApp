@@ -29,7 +29,7 @@ namespace MusicApp.Controllers
 
             if (!String.IsNullOrEmpty(ArtistName))
             {
-                artistList = artistList.Where(u => u.ArtistName.Contains(ArtistName)).ToList();
+                artistList = artistList.Where(u => u.ArtistName.ToLower().Contains(ArtistName)).ToList();
             }
             
             return View(artistList);
