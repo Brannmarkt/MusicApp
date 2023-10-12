@@ -14,6 +14,8 @@ namespace MusicApp.Models
         [ValidateNever]
         public string? Description { get; set; }
         [ValidateNever]
+        public byte[]? Archive { get; set; }
+        [ValidateNever]
         public string? ImageUrl { get; set; }
         [ValidateNever]
         public List<Song>? Songs { get; set; }

@@ -5,36 +5,41 @@
     <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
 </div>
 
-<div class="row pb-3">
-    @foreach (var artist in Model)
-    {
-        <div class="col-lg-3 col-sm-6">
-            <div class="row p-2">
-                <div class="col-12 p-1">
-                    <div class="card border-0 p-3 shadow  border-top border-5 rounded">
+<form method="post" asp-controller="Home" asp-action="Index">
+    <span>Artist:</span><input type="text" name="ArtistName" />
+    <input type="submit" value="Search" />
 
-                        <img src="@artist.ImageUrl" class="card-img-top rounded" />
+    <div class="row pb-3">
+        @foreach (var artist in Model)
+        {
+            <div class="col-lg-3 col-sm-6">
+                <div class="row p-2">
+                    <div class="col-12 p-1">
+                        <div class="card border-0 p-3 shadow  border-top border-5 rounded">
 
-                        <div class="card-body pb-0">
-                            
-                            <div class="pl-1">
-                                <p class="card-title h5 text-dark opacity-75 text-uppercase text-center">@artist.ArtistName</p>
-                                <p class="card-title text-warning text-center">From <b>@artist.Country</b></p>
+                            <img src="@artist.ImageUrl" class="card-img-top rounded" />
+
+                            <div class="card-body pb-0">
+
+                                <div class="pl-1">
+                                    <p class="card-title h5 text-dark opacity-75 text-uppercase text-center">@artist.ArtistName</p>
+                                    <p class="card-title text-warning text-center">From <b>@artist.Country</b></p>
+                                </div>
+
+                            </div>
+
+                            <div>
+                                <a asp-action="Details"
+                                   asp-route-id="@artist.Id"
+                                   class="btn btn-primary bg-gradient border-0 form-control">
+                                    Details
+                                </a>
                             </div>
 
                         </div>
-
-                        <div>
-                            <a asp-action="Details"
-                               asp-route-id="@artist.Id"
-                               class="btn btn-primary bg-gradient border-0 form-control">
-                               Details
-                            </a>
-                        </div>
-
                     </div>
                 </div>
             </div>
-        </div>
-    }
-</div>
+        }
+    </div>
+</form>

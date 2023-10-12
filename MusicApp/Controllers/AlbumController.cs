@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using MusicApp.Models;
 using MusicApp.Models.ViewModels;
 using MusicApp.Repositories.Interfaces;
@@ -43,7 +44,7 @@ namespace MusicApp.Controllers
             return View(albumViewModel);
         }
         [HttpPost]
-        public IActionResult Create(AlbumViewModel albumViewModel, IFormFile? file)
+        public IActionResult Create(AlbumViewModel albumViewModel, IFormFile? file, IFormFile? archive)
         {
             if (ModelState.IsValid)
             {
@@ -72,6 +73,17 @@ namespace MusicApp.Controllers
                     }
 
                     albumViewModel.Album.ImageUrl = @"\images\albums\" + fileName;
+                }
+
+                if(archive != null)
+                {
+                    byte[] fileData;
+                    using (var binaryReader = new BinaryReader(archive.OpenReadStream()))
+                    {
+                        fileData = binaryReader.ReadBytes((int)archive.Length);
+                    }
+
+                    albumViewModel.Album.Archive = fileData;
                 }
 
                 _unitOfWork.Album.Add(albumViewModel.Album);
@@ -115,7 +127,7 @@ namespace MusicApp.Controllers
             return View(albumFromDb);
         }
         [HttpPost]
-        public IActionResult Edit(AlbumViewModel albumViewModel, IFormFile? file)
+        public IActionResult Edit(AlbumViewModel albumViewModel, IFormFile? file, IFormFile? archive)
         {
             if(ModelState.IsValid)
             {
@@ -144,6 +156,17 @@ namespace MusicApp.Controllers
                     }
 
                     albumViewModel.Album.ImageUrl = @"\images\albums\" + fileName;
+                }
+
+                if (archive != null)
+                {
+                    byte[] fileData;
+                    using (var binaryReader = new BinaryReader(archive.OpenReadStream()))
+                    {
+                        fileData = binaryReader.ReadBytes((int)archive.Length);
+                    }
+
+                    albumViewModel.Album.Archive = fileData;
                 }
 
                 _unitOfWork.Album.Update(albumViewModel.Album);
@@ -221,6 +244,22 @@ namespace MusicApp.Controllers
             }
 
             return View(albumFromDb);
+        }
+
+        public IActionResult DownloadArchive(Guid? id)
+        {
+            var file = _unitOfWork.Album.Get(u => u.Id == id);
+            if (file != null && file.Archive != null)
+            {
+                byte[] fileData = file.Archive;
+                string fileName = file.AlbumTitle + ".zip";
+
+                return File(fileData, "application/zip", fileName);
+            }
+            else
+            {
+                return NotFound(); 
+            }
         }
 
         //public IActionResult Upsert(Guid? id)

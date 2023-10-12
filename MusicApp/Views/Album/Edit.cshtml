@@ -14,6 +14,7 @@
         <form method="post" class="row" enctype="multipart/form-data">
             <input asp-for="Album.Id" hidden />
             <input asp-for="Album.ImageUrl" hidden />
+            <input asp-for="Album.Archive" hidden />
             <input asp-for="Album.ArtistId" hidden />
             
 
@@ -41,6 +42,11 @@
                         <div class="form-floating py-2 col-12">
                             <input type="file" name="file" asp-for="Album.ImageUrl" class="form-control border-0 shadow" />
                             <label asp-for="Album.ImageUrl" class="ms-2"></label>
+                        </div>
+
+                        <div class="form-floating py-2 col-12">
+                            <input type="file" name="archive" asp-for="Album.Archive" class="form-control border-0 shadow" />
+                            <label asp-for="Album.Archive" class="ms-2"></label>
                         </div>
 
                         @if (Model.Album.Songs != null)

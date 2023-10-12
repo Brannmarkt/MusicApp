@@ -22,6 +22,18 @@ namespace MusicApp.Controllers
             List<Artist> artistList = _unitOfWork.Artist.GetAll().ToList();
             return View(artistList);
         }
+        [HttpPost]
+        public IActionResult Index(string ArtistName)
+        {
+            List<Artist> artistList = _unitOfWork.Artist.GetAll().ToList();
+
+            if (!String.IsNullOrEmpty(ArtistName))
+            {
+                artistList = artistList.Where(u => u.ArtistName.Contains(ArtistName)).ToList();
+            }
+            
+            return View(artistList);
+        }
 
         public IActionResult Details(Guid id)
         {
