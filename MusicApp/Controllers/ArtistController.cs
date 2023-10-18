@@ -127,12 +127,15 @@ namespace MusicApp.Controllers
                 return NotFound();
             }
 
-            var oldImagePath = Path.Combine(_webHostEnvironment.WebRootPath,
+            if(obj.ImageUrl != null)
+            {
+                var oldImagePath = Path.Combine(_webHostEnvironment.WebRootPath,
                                obj.ImageUrl.TrimStart('\\'));
 
-            if (System.IO.File.Exists(oldImagePath))
-            {
-                System.IO.File.Delete(oldImagePath);
+                if (System.IO.File.Exists(oldImagePath))
+                {
+                    System.IO.File.Delete(oldImagePath);
+                }
             }
 
             _unitOfWork.Artist.Delete(obj);

@@ -8,7 +8,7 @@
             <div class="row">
                 <div class="col-12 text-center">
                     <h3 class="text-dark text-uppercase">@Model.Album.AlbumTitle</h3>
-                    <p class="text-dark fw-semibold mb-0">By@* @Model.Album.Artist.ArtistName*@</p>
+                    <p class="text-dark fw-semibold mb-0">By @* @Model.Album.Artist.ArtistName *@</p>
                 </div>
             </div>
         </div>
@@ -27,6 +27,7 @@
                     </div>
                     
                     <div class="col-12 col-lg-6 offset-lg-1">
+                        <p class="text-secondary lh-sm">Archive size: @(@Model.Album.Archive.Length/1024/1024) mb</p>
                         @Html.ActionLink("Download ZIP", "DownloadArchive", new { id = Model.Album.Id })
                     </div>
 

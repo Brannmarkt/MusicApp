@@ -42,16 +42,16 @@
                         </div>
 
                         <div class="form-floating py-2 col-12">
-                            <input type="file" name="file" asp-for="Album.ImageUrl" class="form-control border-0 shadow" />
+                            <input type="file" accept="image/*" name="file" asp-for="Album.ImageUrl" class="form-control border-0 shadow" />
                             <label asp-for="Album.ImageUrl" class="ms-2"></label>
                         </div>
 
                         <div class="form-floating py-2 col-12">
-                            <input type="file" name="archive" asp-for="Album.Archive" class="form-control border-0 shadow" />
+                            <input type="file" accept=".zip" name="archive" asp-for="Album.Archive" class="form-control border-0 shadow" />
                             <label asp-for="Album.Archive" class="ms-2"></label>
                         </div>
 
-                        @if (Model.Album.Songs != null)
+                       @*  @if (Model.Album.Songs != null)
                         {
                             <h2>Songs List</h2>
                             <table id="tblData" class="table table-bordered table-striped">
@@ -84,7 +84,7 @@
                             <a asp-route-id="@Model.Album.Id" asp-controller="Song" asp-action="Upsert" class="btn btn-primary mx-2">
                                 Add New Song
                             </a>
-                        </div>
+                        </div> *@
 
                         <div class="row mt-3">
                             <div class="col-6 col-md-3">

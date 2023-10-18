@@ -10,5 +10,8 @@ namespace MusicApp.Repositories.Interfaces
         void Add(T entity);
         void Update(T entity);
         void Delete(T entity);
+
+        void Attach(T entity);
+        void Detach(T entity);
     }
 }

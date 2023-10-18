@@ -10,6 +10,7 @@
             </div>
         </div>
     </div>
+
     <div class="card-body p-4">
         <form method="post" class="row" enctype="multipart/form-data">
             <input asp-for="Album.Id" hidden />
@@ -17,6 +18,7 @@
             <input asp-for="Album.Archive" hidden />
             <input asp-for="Album.ArtistId" hidden />
             
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
             <div class="row">
                 <div class="col-10">
@@ -40,12 +42,12 @@
                         </div>
 
                         <div class="form-floating py-2 col-12">
-                            <input type="file" name="file" asp-for="Album.ImageUrl" class="form-control border-0 shadow" />
+                            <input type="file" accept="image/*" name="file" asp-for="Album.ImageUrl" class="form-control border-0 shadow" />
                             <label asp-for="Album.ImageUrl" class="ms-2"></label>
                         </div>
 
                         <div class="form-floating py-2 col-12">
-                            <input type="file" name="archive" asp-for="Album.Archive" class="form-control border-0 shadow" />
+                            <input type="file" accept=".zip" name="archive" asp-for="Album.Archive" class="form-control border-0 shadow" />
                             <label asp-for="Album.Archive" class="ms-2"></label>
                         </div>
 

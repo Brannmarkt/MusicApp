@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using MusicApp.Models;
 using MusicApp.Models.ViewModels;
+using MusicApp.Repositories;
 using MusicApp.Repositories.Interfaces;
 
 namespace MusicApp.Controllers
@@ -44,6 +45,8 @@ namespace MusicApp.Controllers
             return View(albumViewModel);
         }
         [HttpPost]
+        [DisableRequestSizeLimit, RequestFormLimits(MultipartBodyLengthLimit = int.MaxValue,
+        ValueLengthLimit = int.MaxValue)]
         public IActionResult Create(AlbumViewModel albumViewModel, IFormFile? file, IFormFile? archive)
         {
             if (ModelState.IsValid)
@@ -93,7 +96,8 @@ namespace MusicApp.Controllers
                 return RedirectToAction("Index");
             }
 
-            return View();
+            //return View();
+            return RedirectToAction("Index", "Artist");
         }
 
         public IActionResult Edit(Guid id)
@@ -113,7 +117,7 @@ namespace MusicApp.Controllers
 
                 Album = new Album()
                 {
-
+                    
                 }
             };
 
@@ -127,10 +131,21 @@ namespace MusicApp.Controllers
             return View(albumFromDb);
         }
         [HttpPost]
+        [DisableRequestSizeLimit, RequestFormLimits(MultipartBodyLengthLimit = int.MaxValue,
+        ValueLengthLimit = int.MaxValue)]
         public IActionResult Edit(AlbumViewModel albumViewModel, IFormFile? file, IFormFile? archive)
         {
+
             if(ModelState.IsValid)
             {
+                var existingAlbum = _unitOfWork.Album.Get(u => u.Id == albumViewModel.Album.Id);
+                byte[] existingArchive = existingAlbum.Archive;
+
+                _unitOfWork.Album.Detach(existingAlbum);
+
+                existingAlbum = albumViewModel.Album;
+                _unitOfWork.Album.Attach(existingAlbum);
+
                 string wwwRootPath = _webHostEnvironment.WebRootPath;
 
                 if (file != null)
@@ -155,7 +170,8 @@ namespace MusicApp.Controllers
                         file.CopyTo(fileStream);
                     }
 
-                    albumViewModel.Album.ImageUrl = @"\images\albums\" + fileName;
+                    // albumViewModel.Album.ImageUrl = @"\images\albums\" + fileName;
+                    existingAlbum.ImageUrl = @"\images\albums\" + fileName;
                 }
 
                 if (archive != null)
@@ -166,16 +182,21 @@ namespace MusicApp.Controllers
                         fileData = binaryReader.ReadBytes((int)archive.Length);
                     }
 
-                    albumViewModel.Album.Archive = fileData;
+                    existingAlbum.Archive = fileData;
+                }
+                else
+                {
+                    existingAlbum.Archive = existingArchive;
                 }
 
-                _unitOfWork.Album.Update(albumViewModel.Album);
+                _unitOfWork.Album.Update(existingAlbum);
                 _unitOfWork.Save();
                 TempData["success"] = "Album updated successfully";
                 return RedirectToAction("Index");
             }
 
-            return View();
+            //return View();
+            return RedirectToAction("Index");
         }
 
         public IActionResult Delete(Guid? id)

@@ -1,6 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace MusicApp.Models
 {
@@ -14,6 +17,7 @@ namespace MusicApp.Models
         [ValidateNever]
         public string? Description { get; set; }
         [ValidateNever]
+        [BindNever]
         public byte[]? Archive { get; set; }
         [ValidateNever]
         public string? ImageUrl { get; set; }

@@ -64,5 +64,16 @@ namespace MusicApp.Repositories
         {
             _dbSet.Remove(entity);
         }
+
+        public void Attach(T entity)
+        {
+            _context.Attach(entity);
+        }
+
+        public void Detach(T entity) 
+        {
+            var entry = _context.Entry(entity);
+            entry.State = EntityState.Detached;
+        }
     }
 }
