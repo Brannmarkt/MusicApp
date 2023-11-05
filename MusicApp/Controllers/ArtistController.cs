@@ -3,23 +3,24 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using MusicApp.Models;
 using MusicApp.Models.ViewModels;
 using MusicApp.Repositories.Interfaces;
+using MusicApp.Services.Interfaces;
 
 namespace MusicApp.Controllers
 {
     public class ArtistController : Controller
     {
+        private readonly IArtistService _artistService;
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public ArtistController(IUnitOfWork unitOfWork, IWebHostEnvironment webHostEnvironment)
+        public ArtistController(IArtistService artistService, IUnitOfWork unitOfWork)
         {
+            _artistService = artistService;
             _unitOfWork = unitOfWork;
-            _webHostEnvironment = webHostEnvironment;
         }
 
         public IActionResult Index()
         {
-            List<Artist> artistsList = _unitOfWork.Artist.GetAll(includeProperties: "Albums").ToList();
+            List<Artist> artistsList = _artistService.GetAllArtists();
 
             return View(artistsList);
         }
@@ -43,7 +44,7 @@ namespace MusicApp.Controllers
             }
             else
             {
-                artistViewModel.Artist = _unitOfWork.Artist.Get(u => u.Id == id);
+                artistViewModel.Artist = _artistService.GetArtist(id); // edit artist
                 return View(artistViewModel);
             }
         }
@@ -52,43 +53,8 @@ namespace MusicApp.Controllers
         {
             if(ModelState.IsValid)
             {
-                string wwwRootPath = _webHostEnvironment.WebRootPath;
-                
-                if(file != null)
-                {
-                    string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
-                    string productPath = Path.Combine(wwwRootPath, @"images\artists");
+               _artistService.UpsertArtist(artistViewModel, file);
 
-                    if (!string.IsNullOrEmpty(artistViewModel.Artist.ImageUrl))
-                    {
-                        //delete the old image
-                        var oldImagePath =
-                            Path.Combine(wwwRootPath, artistViewModel.Artist.ImageUrl.TrimStart('\\'));
-
-                        if (System.IO.File.Exists(oldImagePath))
-                        {
-                            System.IO.File.Delete(oldImagePath);
-                        }
-                    }
-
-                    using (var fileStream = new FileStream(Path.Combine(productPath, fileName), FileMode.Create))
-                    {
-                        file.CopyTo(fileStream);
-                    }
-
-                    artistViewModel.Artist.ImageUrl = @"\images\artists\" + fileName;
-                }
-
-                if (artistViewModel.Artist.Id == Guid.Empty)
-                {
-                    _unitOfWork.Artist.Add(artistViewModel.Artist);
-                }
-                else
-                {
-                    _unitOfWork.Artist.Update(artistViewModel.Artist);
-                }
-
-                _unitOfWork.Save();
                 TempData["success"] = "Artist created successfully";
                 return RedirectToAction("Index");
             }
@@ -109,7 +75,7 @@ namespace MusicApp.Controllers
             {
                 return NotFound();
             }
-            Artist? artistFromDb = _unitOfWork.Artist.Get(u => u.Id == id);
+            Artist? artistFromDb = _artistService.GetArtist(id);
 
             if (artistFromDb == null)
             {
@@ -117,55 +83,14 @@ namespace MusicApp.Controllers
             }
             return View(artistFromDb);
         }
-
         [HttpPost, ActionName("Delete")]
         public IActionResult DeletePOST(Guid? id)
         {
-            Artist? obj = _unitOfWork.Artist.Get(u => u.Id == id);
-            if (obj == null)
-            {
-                return NotFound();
-            }
+            _artistService.DeleteArtist(id);
 
-            if(obj.ImageUrl != null)
-            {
-                var oldImagePath = Path.Combine(_webHostEnvironment.WebRootPath,
-                               obj.ImageUrl.TrimStart('\\'));
-
-                if (System.IO.File.Exists(oldImagePath))
-                {
-                    System.IO.File.Delete(oldImagePath);
-                }
-            }
-
-            _unitOfWork.Artist.Delete(obj);
-            _unitOfWork.Save();
             TempData["success"] = "Artist was deleted successfully";
             return RedirectToAction("Index");
         }
 
-        //[HttpDelete]
-        //public IActionResult Delete(Guid id)
-        //{
-        //    var artistToBeDeleted = _unitOfWork.Artist.GetById(u => u.Id == id);
-        //    if (artistToBeDeleted == null)
-        //    {
-        //        return Json(new { success = false, message = "Error while deleting" });
-        //    }
-
-        //    var oldImagePath =
-        //                   Path.Combine(_webHostEnvironment.WebRootPath,
-        //                   artistToBeDeleted.ImageUrl.TrimStart('\\'));
-
-        //    if (System.IO.File.Exists(oldImagePath))
-        //    {
-        //        System.IO.File.Delete(oldImagePath);
-        //    }
-
-        //    _unitOfWork.Artist.Delete(artistToBeDeleted);
-        //    _unitOfWork.Save();
-
-        //    return Json(new { success = true, message = "Delete Successful" });
-        //}
     }
 }

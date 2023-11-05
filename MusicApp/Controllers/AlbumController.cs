@@ -5,23 +5,25 @@ using MusicApp.Models;
 using MusicApp.Models.ViewModels;
 using MusicApp.Repositories;
 using MusicApp.Repositories.Interfaces;
+using MusicApp.Services;
+using MusicApp.Services.Interfaces;
 
 namespace MusicApp.Controllers
 {
     public class AlbumController : Controller
     {
+        private readonly IAlbumService _albumService;
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public AlbumController(IUnitOfWork unitOfWork, IWebHostEnvironment webHostEnvironment)
+        public AlbumController(IAlbumService albumService, IUnitOfWork unitOfWork)
         {
+            _albumService = albumService;
             _unitOfWork = unitOfWork;
-            _webHostEnvironment = webHostEnvironment;
         }
 
         public IActionResult Index()
         {
-            List<Album> albumList = _unitOfWork.Album.GetAll(includeProperties: "Songs").ToList();
+            List<Album> albumList = _albumService.GetAllAlbums();
 
             return View(albumList);
         }
@@ -51,46 +53,8 @@ namespace MusicApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                string wwwRootPath = _webHostEnvironment.WebRootPath;
+                _albumService.CreateAlbum(albumViewModel, file, archive);
 
-                if (file != null)
-                {
-                    string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
-                    string productPath = Path.Combine(wwwRootPath, @"images\albums");
-
-                    if (!string.IsNullOrEmpty(albumViewModel.Album.ImageUrl))
-                    {
-                        //delete the old image
-                        var oldImagePath =
-                            Path.Combine(wwwRootPath, albumViewModel.Album.ImageUrl.TrimStart('\\'));
-
-                        if (System.IO.File.Exists(oldImagePath))
-                        {
-                            System.IO.File.Delete(oldImagePath);
-                        }
-                    }
-
-                    using (var fileStream = new FileStream(Path.Combine(productPath, fileName), FileMode.Create))
-                    {
-                        file.CopyTo(fileStream);
-                    }
-
-                    albumViewModel.Album.ImageUrl = @"\images\albums\" + fileName;
-                }
-
-                if(archive != null)
-                {
-                    byte[] fileData;
-                    using (var binaryReader = new BinaryReader(archive.OpenReadStream()))
-                    {
-                        fileData = binaryReader.ReadBytes((int)archive.Length);
-                    }
-
-                    albumViewModel.Album.Archive = fileData;
-                }
-
-                _unitOfWork.Album.Add(albumViewModel.Album);
-                _unitOfWork.Save();
                 TempData["success"] = "Category was created successfully";
 
                 return RedirectToAction("Index");
@@ -135,67 +99,14 @@ namespace MusicApp.Controllers
         ValueLengthLimit = int.MaxValue)]
         public IActionResult Edit(AlbumViewModel albumViewModel, IFormFile? file, IFormFile? archive)
         {
-
             if(ModelState.IsValid)
             {
-                var existingAlbum = _unitOfWork.Album.Get(u => u.Id == albumViewModel.Album.Id);
-                byte[] existingArchive = existingAlbum.Archive;
+                _albumService.EditAlbum(albumViewModel, file, archive);
 
-                _unitOfWork.Album.Detach(existingAlbum);
-
-                existingAlbum = albumViewModel.Album;
-                _unitOfWork.Album.Attach(existingAlbum);
-
-                string wwwRootPath = _webHostEnvironment.WebRootPath;
-
-                if (file != null)
-                {
-                    string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
-                    string productPath = Path.Combine(wwwRootPath, @"images\albums");
-
-                    if (!string.IsNullOrEmpty(albumViewModel.Album.ImageUrl))
-                    {
-                        //delete the old image
-                        var oldImagePath =
-                            Path.Combine(wwwRootPath, albumViewModel.Album.ImageUrl.TrimStart('\\'));
-
-                        if (System.IO.File.Exists(oldImagePath))
-                        {
-                            System.IO.File.Delete(oldImagePath);
-                        }
-                    }
-
-                    using (var fileStream = new FileStream(Path.Combine(productPath, fileName), FileMode.Create))
-                    {
-                        file.CopyTo(fileStream);
-                    }
-
-                    // albumViewModel.Album.ImageUrl = @"\images\albums\" + fileName;
-                    existingAlbum.ImageUrl = @"\images\albums\" + fileName;
-                }
-
-                if (archive != null)
-                {
-                    byte[] fileData;
-                    using (var binaryReader = new BinaryReader(archive.OpenReadStream()))
-                    {
-                        fileData = binaryReader.ReadBytes((int)archive.Length);
-                    }
-
-                    existingAlbum.Archive = fileData;
-                }
-                else
-                {
-                    existingAlbum.Archive = existingArchive;
-                }
-
-                _unitOfWork.Album.Update(existingAlbum);
-                _unitOfWork.Save();
                 TempData["success"] = "Album updated successfully";
                 return RedirectToAction("Index");
             }
 
-            //return View();
             return RedirectToAction("Index");
         }
 
@@ -205,7 +116,7 @@ namespace MusicApp.Controllers
             {
                 return NotFound();
             }
-            Album? albumFromDb = _unitOfWork.Album.Get(u => u.Id == id);
+            Album? albumFromDb = _albumService.GetAlbum(id);
 
             if (albumFromDb == null)
             {
@@ -216,22 +127,8 @@ namespace MusicApp.Controllers
         [HttpPost, ActionName("Delete")]
         public IActionResult DeletePOST(Guid? id)
         {
-            Album? obj = _unitOfWork.Album.Get(u => u.Id == id);
-            if (obj == null)
-            {
-                return NotFound();
-            }
+            _albumService.DeleteAlbum(id);
 
-            var oldImagePath = Path.Combine(_webHostEnvironment.WebRootPath,
-                               obj.ImageUrl.TrimStart('\\'));
-
-            if (System.IO.File.Exists(oldImagePath))
-            {
-                System.IO.File.Delete(oldImagePath);
-            }
-
-            _unitOfWork.Album.Delete(obj);
-            _unitOfWork.Save();
             TempData["success"] = "Album was deleted successfully";
             return RedirectToAction("Index");
         }
@@ -257,7 +154,7 @@ namespace MusicApp.Controllers
                 }
             };
 
-            albumFromDb.Album = _unitOfWork.Album.Get(u => u.Id == id);
+            albumFromDb.Album = _albumService.GetAlbum(id);
 
             if (albumFromDb == null)
             {
@@ -269,10 +166,10 @@ namespace MusicApp.Controllers
 
         public IActionResult DownloadArchive(Guid? id)
         {
-            var file = _unitOfWork.Album.Get(u => u.Id == id);
+            var file = _albumService.GetAlbum(id);
             if (file != null && file.Archive != null)
             {
-                byte[] fileData = file.Archive;
+                byte[] fileData = _albumService.DownloadArchive(file);
                 string fileName = file.AlbumTitle + ".zip";
 
                 return File(fileData, "application/zip", fileName);
@@ -283,76 +180,5 @@ namespace MusicApp.Controllers
             }
         }
 
-        //public IActionResult Upsert(Guid? id)
-        //{
-        //    AlbumViewModel albumViewModel = new()
-        //    {
-        //        Album = new Album()
-        //        {
-        //            ArtistId = id ?? throw new ArgumentNullException(nameof(id)),
-        //        }
-        //    };
-
-        //    if (_unitOfWork.Album.Get(u => u.ArtistId == id) == null)
-        //    {
-        //        return View(albumViewModel); // create new album
-        //    }
-        //    else
-        //    {
-        //        albumViewModel.Album = _unitOfWork.Album.Get(u => u.ArtistId == id);
-        //        return View(albumViewModel);
-        //    }
-        //}
-        //[HttpPost]
-        //public IActionResult Upsert(AlbumViewModel albumViewModel, IFormFile? file)
-        //{
-        //    if(ModelState.IsValid)
-        //    {
-        //        string wwwRootPath = _webHostEnvironment.WebRootPath;
-
-        //        if (file != null)
-        //        {
-        //            string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
-        //            string productPath = Path.Combine(wwwRootPath, @"images\albums");
-
-        //            if (!string.IsNullOrEmpty(albumViewModel.Album.ImageUrl))
-        //            {
-        //                //delete the old image
-        //                var oldImagePath =
-        //                    Path.Combine(wwwRootPath, albumViewModel.Album.ImageUrl.TrimStart('\\'));
-
-        //                if (System.IO.File.Exists(oldImagePath))
-        //                {
-        //                    System.IO.File.Delete(oldImagePath);
-        //                }
-        //            }
-
-        //            using (var fileStream = new FileStream(Path.Combine(productPath, fileName), FileMode.Create))
-        //            {
-        //                file.CopyTo(fileStream);
-        //            }
-
-        //            albumViewModel.Album.ImageUrl = @"\images\albums\" + fileName;
-        //        }
-
-        //        if (albumViewModel.Album.Id == Guid.Empty)
-        //        {
-
-        //            _unitOfWork.Album.Add(albumViewModel.Album);
-        //        }
-        //        else
-        //        {
-        //            _unitOfWork.Album.Update(albumViewModel.Album);
-        //        }
-
-        //        _unitOfWork.Save();
-        //        TempData["success"] = "Album created successfully";
-        //        return RedirectToAction("Index");
-        //    }
-        //    else
-        //    {
-        //        return View(albumViewModel);
-        //    }
-        //}
     }
 }

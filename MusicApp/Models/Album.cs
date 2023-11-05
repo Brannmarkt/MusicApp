@@ -16,7 +16,7 @@ namespace MusicApp.Models
         public DateTime ReleaseDate { get; set; }
         [ValidateNever]
         public string? Description { get; set; }
-        [ValidateNever]
+        
         [BindNever]
         public byte[]? Archive { get; set; }
         [ValidateNever]

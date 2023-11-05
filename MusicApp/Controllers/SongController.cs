@@ -4,19 +4,20 @@ using MusicApp.Extensions;
 using MusicApp.Models;
 using MusicApp.Models.ViewModels;
 using MusicApp.Repositories.Interfaces;
+using MusicApp.Services.Interfaces;
 using System.Web;
 
 namespace MusicApp.Controllers
 {
     public class SongController : Controller
     {
+        private readonly ISongService _songService;
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public SongController(IUnitOfWork unitOfWork, IWebHostEnvironment webHostEnvironment)
+        public SongController(ISongService songService, IUnitOfWork unitOfWork)
         {
+            _songService = songService;
             _unitOfWork = unitOfWork;
-            _webHostEnvironment = webHostEnvironment;
         }
 
         public IActionResult Index()
@@ -43,20 +44,8 @@ namespace MusicApp.Controllers
         {
             if(ModelState.IsValid)
             {
-                if (file != null)
-                {
-                    byte[] fileData;
-                    using (var binaryReader = new BinaryReader(file.OpenReadStream()))
-                    {
-                        fileData = binaryReader.ReadBytes((int)file.Length);
-                    }
+                _songService.CreateSong(songViewModel, file);
 
-                    songViewModel.Song.Content = fileData;
-                    songViewModel.Song.ContentType = file.ContentType;
-                }
-
-                _unitOfWork.Song.Add(songViewModel.Song);
-                _unitOfWork.Save();
                 TempData["success"] = "Song was created successfully";
 
                 return RedirectToAction("Index");
@@ -79,7 +68,7 @@ namespace MusicApp.Controllers
 
                 }
             };
-            songFromDb.Song = _unitOfWork.Song.Get(u => u.Id == id);
+            songFromDb.Song = _songService.GetSong(id);
 
             if (songFromDb == null)
             {
@@ -93,20 +82,8 @@ namespace MusicApp.Controllers
         {
             if(ModelState.IsValid)
             {
-                if (file != null)
-                {
-                    byte[] fileData;
-                    using (var binaryReader = new BinaryReader(file.OpenReadStream()))
-                    {
-                        fileData = binaryReader.ReadBytes((int)file.Length);
-                    }
+                _songService.EditSong(songViewModel, file);
 
-                    songViewModel.Song.Content = fileData;
-                    songViewModel.Song.ContentType = file.ContentType;
-                }
-
-                _unitOfWork.Song.Update(songViewModel.Song);
-                _unitOfWork.Save();
                 TempData["success"] = "Song was created successfully";
 
                 return RedirectToAction("Index");
@@ -121,25 +98,21 @@ namespace MusicApp.Controllers
             {
                 return NotFound();
             }
-            Song? songFromDb = _unitOfWork.Song.Get(u => u.Id == id);
+
+            Song? songFromDb = _songService.GetSong(id);
 
             if (songFromDb == null)
             {
                 return NotFound();
             }
+
             return View(songFromDb);
         }
         [HttpPost, ActionName("Delete")]
         public IActionResult DeletePOST(Guid? id)
         {
-            Song? obj = _unitOfWork.Song.Get(u => u.Id == id);
-            if (obj == null)
-            {
-                return NotFound();
-            }
-            
-            _unitOfWork.Song.Delete(obj);
-            _unitOfWork.Save();
+            _songService.DeleteSong(id);
+
             TempData["success"] = "Song was deleted successfully";
             return RedirectToAction("Index");
         }
@@ -158,7 +131,7 @@ namespace MusicApp.Controllers
 
                 }
             };
-            songFromDb.Song = _unitOfWork.Song.Get(u => u.Id == id);
+            songFromDb.Song = _songService.GetSong(id);
 
             if (songFromDb == null)
             {
