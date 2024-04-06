@@ -34,7 +34,7 @@ namespace MusicApp.Services
         {
             if (file != null)
             {
-                artistViewModel.Artist.ImageUrl = UploadPicture(artistViewModel, file);
+                artistViewModel.Artist.Image = UploadPicture(file);
             }
 
             if (artistViewModel.Artist.Id == Guid.Empty)
@@ -53,52 +53,62 @@ namespace MusicApp.Services
         {
             Artist? obj = _unitOfWork.Artist.Get(u => u.Id == id);
 
-            if (obj.ImageUrl != null)
-            {
-                var oldImagePath = Path.Combine(_webHostEnvironment.WebRootPath,
-                               obj.ImageUrl.TrimStart('\\'));
+            //if (obj.ImageUrl != null)
+            //{
+            //    var oldImagePath = Path.Combine(_webHostEnvironment.WebRootPath,
+            //                   obj.ImageUrl.TrimStart('\\'));
 
-                if (System.IO.File.Exists(oldImagePath))
-                {
-                    System.IO.File.Delete(oldImagePath);
-                }
-            }
+            //    if (System.IO.File.Exists(oldImagePath))
+            //    {
+            //        System.IO.File.Delete(oldImagePath);
+            //    }
+            //}
 
             _unitOfWork.Artist.Delete(obj);
             _unitOfWork.Save();
         }
 
-
-        private string UploadPicture(ArtistViewModel artistViewModel, IFormFile? picture)
+        private byte[] UploadPicture(IFormFile? picture)
         {
-            string wwwRootPath = _webHostEnvironment.WebRootPath;
-
-            if (picture != null)
+            byte[] fileData;
+            using (var binaryReader = new BinaryReader(picture.OpenReadStream()))
             {
-                string fileName = Guid.NewGuid().ToString() + Path.GetExtension(picture.FileName);
-                string productPath = Path.Combine(wwwRootPath, @"images\albums");
-
-                if (!string.IsNullOrEmpty(artistViewModel.Artist.ImageUrl))
-                {
-                    //delete the old image
-                    var oldImagePath =
-                        Path.Combine(wwwRootPath, artistViewModel.Artist.ImageUrl.TrimStart('\\'));
-
-                    if (System.IO.File.Exists(oldImagePath))
-                    {
-                        System.IO.File.Delete(oldImagePath);
-                    }
-                }
-
-                using (var fileStream = new FileStream(Path.Combine(productPath, fileName), FileMode.Create))
-                {
-                    picture.CopyTo(fileStream);
-                }
-
-                return @"\images\albums\" + fileName;
+                fileData = binaryReader.ReadBytes((int)picture.Length);
             }
 
-            return null!;
+            return fileData;
         }
+
+        //private string UploadPicture(ArtistViewModel artistViewModel, IFormFile? picture)
+        //{
+        //    string wwwRootPath = _webHostEnvironment.WebRootPath;
+
+        //    if (picture != null)
+        //    {
+        //        string fileName = Guid.NewGuid().ToString() + Path.GetExtension(picture.FileName);
+        //        string productPath = Path.Combine(wwwRootPath, @"images\albums");
+
+        //        if (!string.IsNullOrEmpty(artistViewModel.Artist.ImageUrl))
+        //        {
+        //            //delete the old image
+        //            var oldImagePath =
+        //                Path.Combine(wwwRootPath, artistViewModel.Artist.ImageUrl.TrimStart('\\'));
+
+        //            if (System.IO.File.Exists(oldImagePath))
+        //            {
+        //                System.IO.File.Delete(oldImagePath);
+        //            }
+        //        }
+
+        //        using (var fileStream = new FileStream(Path.Combine(productPath, fileName), FileMode.Create))
+        //        {
+        //            picture.CopyTo(fileStream);
+        //        }
+
+        //        return @"\images\albums\" + fileName;
+        //    }
+
+        //    return null!;
+        //}
     }
 }

@@ -7,6 +7,7 @@ using MusicApp.Services.Interfaces;
 
 namespace MusicApp.Controllers
 {
+    
     public class ArtistController : Controller
     {
         private readonly IArtistService _artistService;
@@ -25,6 +26,7 @@ namespace MusicApp.Controllers
             return View(artistsList);
         }
 
+        public static bool UpdateOrCreate;
         public IActionResult Upsert(Guid? id)
         {
             ArtistViewModel artistViewModel = new()
@@ -38,19 +40,26 @@ namespace MusicApp.Controllers
                 Artist = new Artist()
             };
 
-            if(id == null)
+            if (id == null)
             {
+                UpdateOrCreate = false;
                 return View(artistViewModel); // create new artist
             }
             else
             {
                 artistViewModel.Artist = _artistService.GetArtist(id); // edit artist
+                UpdateOrCreate = true;
                 return View(artistViewModel);
             }
         }
         [HttpPost]
         public IActionResult Upsert(ArtistViewModel artistViewModel, IFormFile? file)
         {
+            if (UpdateOrCreate == true)
+            {
+                artistViewModel.UpdateOrCreate = true;
+            }
+
             if(ModelState.IsValid)
             {
                _artistService.UpsertArtist(artistViewModel, file);

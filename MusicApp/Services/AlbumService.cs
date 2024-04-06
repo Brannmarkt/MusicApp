@@ -5,6 +5,8 @@ using MusicApp.Models;
 using MusicApp.Models.ViewModels;
 using MusicApp.Repositories.Interfaces;
 using MusicApp.Services.Interfaces;
+using System.Drawing;
+using System.Security.Cryptography.X509Certificates;
 
 namespace MusicApp.Services
 {
@@ -37,7 +39,8 @@ namespace MusicApp.Services
         {
             if (file != null)
             {
-                albumViewModel.Album.ImageUrl = UploadPicture(albumViewModel, file);
+                albumViewModel.Album.Image = UploadPicture(file);
+                albumViewModel.Album.ImageType = file.ContentType;
             }
 
             if (archive != null)
@@ -53,15 +56,21 @@ namespace MusicApp.Services
         {
             var existingAlbum = _unitOfWork.Album.Get(u => u.Id == albumViewModel.Album.Id);
             byte[] existingArchive = existingAlbum.Archive;
-
+            byte[] exisingImage = existingAlbum.Image;
+            
             _unitOfWork.Album.Detach(existingAlbum);
 
             existingAlbum = albumViewModel.Album;
             _unitOfWork.Album.Attach(existingAlbum);
 
-            if (file != null)
+            if (file != null && file?.Length != 0)
             {
-                existingAlbum.ImageUrl = UploadPicture(albumViewModel, file);
+                existingAlbum.Image = UploadPicture(file);
+                existingAlbum.ImageType = file.ContentType;
+            }
+            else
+            {
+                existingAlbum.Image = exisingImage;
             }
 
             if (archive != null)
@@ -81,13 +90,13 @@ namespace MusicApp.Services
         {
             Album? obj = _unitOfWork.Album.Get(u => u.Id == id);
 
-            var oldImagePath = Path.Combine(_webHostEnvironment.WebRootPath,
+            /*var oldImagePath = Path.Combine(_webHostEnvironment.WebRootPath,
                                obj.ImageUrl.TrimStart('\\'));
 
             if (System.IO.File.Exists(oldImagePath))
             {
                 System.IO.File.Delete(oldImagePath);
-            }
+            }*/
 
             _unitOfWork.Album.Delete(obj);
             _unitOfWork.Save();
@@ -99,7 +108,18 @@ namespace MusicApp.Services
             return fileData;
         }
 
-        private string UploadPicture(AlbumViewModel albumViewModel, IFormFile? picture)
+        private byte[] UploadPicture(IFormFile? picture)
+        {
+            byte[] fileData;
+            using (var binaryReader = new BinaryReader(picture.OpenReadStream()))
+            {
+                fileData = binaryReader.ReadBytes((int)picture.Length);
+            }
+
+            return fileData;
+        }
+
+        /*private string UploadPicture(AlbumViewModel albumViewModel, IFormFile? picture)
         {
             string wwwRootPath = _webHostEnvironment.WebRootPath;
 
@@ -129,7 +149,7 @@ namespace MusicApp.Services
             }
 
             return null!;
-        }
+        }*/
 
         private byte[] UploadArchive(IFormFile? archive)
         {

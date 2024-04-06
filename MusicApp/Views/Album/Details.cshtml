@@ -8,7 +8,7 @@
             <div class="row">
                 <div class="col-12 text-center">
                     <h3 class="text-dark text-uppercase">@Model.Album.AlbumTitle</h3>
-                    <p class="text-dark fw-semibold mb-0">By @* @Model.Album.Artist.ArtistName *@</p>
+                   @*  <p class="text-dark fw-semibold mb-0">By  @Model.Album.Artist.ArtistName </p> *@
                 </div>
             </div>
         </div>
@@ -16,7 +16,10 @@
             <div class="py-3">
                 <div class="row">
                     <div class="col-12 col-lg-3 offset-lg-1 text-center mb-3">
-                        <img src="@Model.Album.ImageUrl" width="100%" class="rounded" />
+                        @if(Model.Album.Image != null)
+                        {
+                            <img src="data:image/jpeg;base64,@Convert.ToBase64String(Model.Album.Image)" alt="Image:]" width="100%" class="rounded" />
+                        }
                     </div>
                     <div class="col-12 col-lg-6 offset-lg-1">
 

@@ -14,7 +14,7 @@
     <div class="card-body p-4">
         <form method="post" class="row" enctype="multipart/form-data">
             <input asp-for="Album.Id" hidden />
-            <input asp-for="Album.ImageUrl" hidden />
+            <input asp-for="Album.Image" hidden />
             <input asp-for="Album.Archive" hidden />
             <input asp-for="Album.ArtistId" hidden />
 
@@ -42,8 +42,8 @@
                         </div>
 
                         <div class="form-floating py-2 col-12">
-                            <input type="file" accept="image/*" name="file" asp-for="Album.ImageUrl" class="form-control border-0 shadow" />
-                            <label asp-for="Album.ImageUrl" class="ms-2"></label>
+                            <input type="file" accept="image/*" name="file" asp-for="Album.Image" class="form-control border-0 shadow" />
+                            <label asp-for="Album.Image" class="ms-2"></label>
                         </div>
 
                         <div class="form-floating py-2 col-12">

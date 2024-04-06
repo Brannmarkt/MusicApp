@@ -14,8 +14,8 @@
     <div class="card-body p-4">
         <form method="post" class="row" enctype="multipart/form-data">
             <input asp-for="Album.Id" hidden />
-            <input asp-for="Album.ImageUrl" hidden />
-            <input asp-for="Album.Archive" hidden />
+            @* <input asp-for="Album.Image" hidden />
+            <input asp-for="Album.Archive" hidden /> *@
             <input asp-for="Album.ArtistId" hidden />
             
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
@@ -42,8 +42,8 @@
                         </div>
 
                         <div class="form-floating py-2 col-12">
-                            <input type="file" accept="image/*" name="file" asp-for="Album.ImageUrl" class="form-control border-0 shadow" />
-                            <label asp-for="Album.ImageUrl" class="ms-2"></label>
+                            <input type="file" accept="image/*" name="file" asp-for="Album.Image" class="form-control border-0 shadow" />
+                            <label asp-for="Album.Image" class="ms-2"></label>
                         </div>
 
                         <div class="form-floating py-2 col-12">
@@ -120,8 +120,11 @@
                     </div>
                 </div>
                 <div class="col-2">
-                    <img src="@Model.Album.ImageUrl" width="100%"
+                    @if(Model.Album.Image != null)
+                    {
+                        <img src="data:image/jpeg;base64,@Convert.ToBase64String(Model.Album.Image)" alt="Image:]" width="100%"
                          style="border-radius:5px; border:1px solid #bbb9b9" />
+                    }
                 </div>
             </div>
         </form>

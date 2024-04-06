@@ -11,6 +11,8 @@ namespace MusicApp.Models
         public string ArtistName { get; set; }
         [ValidateNever]
         public string? ImageUrl { get; set; }
+        [ValidateNever]
+        public byte[]? Image {  get; set; }
         [Required(ErrorMessage = "Country is required")]
         public string Country { get; set; }
         [ValidateNever]

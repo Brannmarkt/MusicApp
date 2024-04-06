@@ -22,6 +22,11 @@ namespace MusicApp.Models
         [ValidateNever]
         public string? ImageUrl { get; set; }
         [ValidateNever]
+        //[BindNever]   check comments on edit view (fucking input elements on the top of the form)
+        public byte[]? Image { get; set; }
+        [ValidateNever]
+        public string? ImageType {  get; set; }
+        [ValidateNever]
         public List<Song>? Songs { get; set; }
 
         public Guid ArtistId { get; set; }

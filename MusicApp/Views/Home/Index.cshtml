@@ -17,7 +17,11 @@
                     <div class="col-12 p-1">
                         <div class="card border-0 p-3 shadow  border-top border-5 rounded">
 
-                            <img src="@artist.ImageUrl" class="card-img-top rounded" />
+                            @if (artist.Image != null)
+                            {
+                                <img src="data:image/jpeg;base64,@Convert.ToBase64String(artist.Image)" alt="Image:]" width="100%"
+                                     style="border-radius:5px; border:1px solid #bbb9b9" />
+                            }
 
                             <div class="card-body pb-0">
 
