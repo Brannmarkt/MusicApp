@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using MusicApp.Data;
 using MusicApp.Models;
 using MusicApp.Models.ViewModels;
 using MusicApp.Repositories.Interfaces;
@@ -19,6 +21,7 @@ namespace MusicApp.Controllers
             _unitOfWork = unitOfWork;
         }
 
+        [Authorize(Roles = $"{Constants.Roles.Manager},{Constants.Roles.Administrator}")]
         public IActionResult Index()
         {
             List<Artist> artistsList = _artistService.GetAllArtists();
@@ -27,6 +30,7 @@ namespace MusicApp.Controllers
         }
 
         public static bool UpdateOrCreate;
+        [Authorize(Roles = $"{Constants.Roles.Manager},{Constants.Roles.Administrator}")]
         public IActionResult Upsert(Guid? id)
         {
             ArtistViewModel artistViewModel = new()
@@ -78,6 +82,8 @@ namespace MusicApp.Controllers
             }
         }
 
+
+        [Authorize(Roles = $"{Constants.Roles.Manager},{Constants.Roles.Administrator}")]
         public IActionResult Delete(Guid? id)
         {
             if (id == Guid.Empty)

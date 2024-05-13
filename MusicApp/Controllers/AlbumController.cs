@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using MusicApp.Data;
 using MusicApp.Models;
 using MusicApp.Models.ViewModels;
 using MusicApp.Repositories;
@@ -21,6 +23,7 @@ namespace MusicApp.Controllers
             _unitOfWork = unitOfWork;
         }
 
+        [Authorize(Roles = $"{Constants.Roles.Manager},{Constants.Roles.Administrator}")]
         public IActionResult Index()
         {
             List<Album> albumList = _albumService.GetAllAlbums();
@@ -28,6 +31,7 @@ namespace MusicApp.Controllers
             return View(albumList);
         }
 
+        [Authorize(Roles = $"{Constants.Roles.Manager},{Constants.Roles.Administrator}")]
         public IActionResult Create(Guid id)
         {
             AlbumViewModel albumViewModel = new()
@@ -64,6 +68,7 @@ namespace MusicApp.Controllers
             return RedirectToAction("Index", "Artist");
         }
 
+        [Authorize(Roles = $"{Constants.Roles.Manager},{Constants.Roles.Administrator}")]
         public IActionResult Edit(Guid id)
         {
             if (id == Guid.Empty)
@@ -110,6 +115,7 @@ namespace MusicApp.Controllers
             return RedirectToAction("Index");
         }
 
+        [Authorize(Roles = $"{Constants.Roles.Manager},{Constants.Roles.Administrator}")]
         public IActionResult Delete(Guid? id)
         {
             if (id == Guid.Empty)
@@ -133,6 +139,7 @@ namespace MusicApp.Controllers
             return RedirectToAction("Index");
         }
 
+        [Authorize(Roles = $"{Constants.Roles.User},{Constants.Roles.Administrator}")]
         public IActionResult Details(Guid? id)
         {
             if (id == Guid.Empty)
@@ -164,6 +171,7 @@ namespace MusicApp.Controllers
             return View(albumFromDb);
         }
 
+        [Authorize(Roles = $"{Constants.Roles.User},{Constants.Roles.Administrator}")]
         public IActionResult DownloadArchive(Guid? id)
         {
             var file = _albumService.GetAlbum(id);

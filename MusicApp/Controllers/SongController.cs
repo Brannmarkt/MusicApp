@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.VisualBasic.FileIO;
+using MusicApp.Data;
 using MusicApp.Extensions;
 using MusicApp.Models;
 using MusicApp.Models.ViewModels;
@@ -27,6 +29,7 @@ namespace MusicApp.Controllers
             return View();
         }
 
+        [Authorize(Roles = $"{Constants.Roles.Manager},{Constants.Roles.Administrator}")]
         public IActionResult Create(Guid id)
         {
             SongViewModel songViewModel = new SongViewModel()
@@ -54,6 +57,7 @@ namespace MusicApp.Controllers
             return View();
         }
 
+        [Authorize(Roles = $"{Constants.Roles.Manager},{Constants.Roles.Administrator}")]
         public IActionResult Edit(Guid id) 
         {
             if (id == Guid.Empty)
@@ -92,6 +96,7 @@ namespace MusicApp.Controllers
             return View();
         }
 
+        [Authorize(Roles = $"{Constants.Roles.Manager},{Constants.Roles.Administrator}")]
         public IActionResult Delete(Guid? id)
         {
             if (id == Guid.Empty)

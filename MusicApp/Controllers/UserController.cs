@@ -46,7 +46,6 @@ namespace MusicApp.Controllers
 
             return View(vm);
         }
-
         [HttpPost]
         public async Task<IActionResult> OnPostAsync(EditUserViewModel editUserViewModel)
         {
