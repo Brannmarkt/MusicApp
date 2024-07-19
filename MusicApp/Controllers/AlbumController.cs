@@ -139,7 +139,7 @@ namespace MusicApp.Controllers
             return RedirectToAction("Index");
         }
 
-        [Authorize(Roles = $"{Constants.Roles.User},{Constants.Roles.Administrator}")]
+        //[Authorize(Roles = $"{Constants.Roles.User},{Constants.Roles.Administrator}")]
         public IActionResult Details(Guid? id)
         {
             if (id == Guid.Empty)

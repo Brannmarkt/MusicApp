@@ -29,10 +29,19 @@
 
                     </div>
                     
-                    <div class="col-12 col-lg-6 offset-lg-1">
-                        <p class="text-secondary lh-sm">Archive size: @(@Model.Album.Archive.Length/1024/1024) mb</p>
-                        @Html.ActionLink("Download ZIP", "DownloadArchive", new { id = Model.Album.Id })
-                    </div>
+                    @if (Model.Album.Archive != null)
+                    {
+                        <div class="col-12 col-lg-6 offset-lg-1">
+                            <p class="text-secondary lh-sm">Archive size: @(@Model.Album.Archive.Length / 1024 / 1024) mb</p>
+                            @Html.ActionLink("Download ZIP", "DownloadArchive", new { id = Model.Album.Id })
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="col-12 col-lg-6 offset-lg-1">
+                            <p class="text-secondary lh-sm">Archive is not added</p>
+                        </div>
+                    }
 
                 </div>
 

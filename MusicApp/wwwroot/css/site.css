@@ -751,6 +751,7 @@ footer {
     padding-left: calc(var(--bs-gutter-x) * .5);
     margin-right: auto;
     margin-left: auto
+    
 }
 
 @media (min-width:576px) {

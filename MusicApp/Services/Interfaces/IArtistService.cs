@@ -7,7 +7,9 @@ namespace MusicApp.Services.Interfaces
     {
         List<Artist> GetAllArtists();
         Artist GetArtist(Guid? id);
-        void UpsertArtist(ArtistViewModel artistViewModel, IFormFile? file);
+       // void UpsertArtist(ArtistViewModel artistViewModel, IFormFile? file);
+        void CreateArtist(ArtistViewModel artistViewModel, IFormFile file);
+        void UpdateArtist(ArtistViewModel artistViewModel, IFormFile file);
         void DeleteArtist(Guid? id);
     }
 }

@@ -30,22 +30,44 @@ namespace MusicApp.Services
             return artist;
         }
 
-        public void UpsertArtist(ArtistViewModel artistViewModel, IFormFile? file)
+        //public void UpsertArtist(ArtistViewModel artistViewModel, IFormFile? file)
+        //{
+        //    if (file != null)
+        //    {
+        //        artistViewModel.Artist.Image = UploadPicture(file);
+        //    }
+
+        //    if (artistViewModel.Artist.Id == Guid.Empty)
+        //    {
+        //        _unitOfWork.Artist.Add(artistViewModel.Artist);
+        //    }
+        //    else
+        //    {
+        //        _unitOfWork.Artist.Update(artistViewModel.Artist);
+        //    }
+
+        //    _unitOfWork.Save();
+        //}
+
+        public void CreateArtist(ArtistViewModel artistViewModel, IFormFile file)
         {
             if (file != null)
             {
                 artistViewModel.Artist.Image = UploadPicture(file);
             }
 
-            if (artistViewModel.Artist.Id == Guid.Empty)
+            _unitOfWork.Artist.Add(artistViewModel.Artist);
+            _unitOfWork.Save();
+        }
+
+        public void UpdateArtist(ArtistViewModel artistViewModel, IFormFile file)
+        {
+            if (file != null)
             {
-                _unitOfWork.Artist.Add(artistViewModel.Artist);
-            }
-            else
-            {
-                _unitOfWork.Artist.Update(artistViewModel.Artist);
+                artistViewModel.Artist.Image = UploadPicture(file);
             }
 
+            _unitOfWork.Artist.Update(artistViewModel.Artist);
             _unitOfWork.Save();
         }
 

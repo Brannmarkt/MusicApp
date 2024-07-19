@@ -29,9 +29,62 @@ namespace MusicApp.Controllers
             return View(artistsList);
         }
 
-        public static bool UpdateOrCreate;
+        //public static bool UpdateOrCreate;
+        //[Authorize(Roles = $"{Constants.Roles.Manager},{Constants.Roles.Administrator}")]
+        //public IActionResult Upsert(Guid? id)
+        //{
+        //    ArtistViewModel artistViewModel = new()
+        //    {
+        //        AlbumList = _unitOfWork.Album.GetAll().Select(u => new SelectListItem
+        //        {
+        //            Text = u.AlbumTitle,
+        //            Value = u.Id.ToString()
+        //        }),
+
+        //        Artist = new Artist()
+        //    };
+
+        //    if (id == null)
+        //    {
+        //        UpdateOrCreate = false;
+        //        return View(artistViewModel); // create new artist
+        //    }
+        //    else
+        //    {
+        //        artistViewModel.Artist = _artistService.GetArtist(id); // edit artist
+        //        UpdateOrCreate = true;
+        //        return View(artistViewModel);
+        //    }
+        //}
+        //[HttpPost]
+        //public IActionResult Upsert(ArtistViewModel artistViewModel, IFormFile? file)
+        //{
+        //    if (UpdateOrCreate == true)
+        //    {
+        //        artistViewModel.UpdateOrCreate = true;
+        //    }
+
+        //    if(ModelState.IsValid)
+        //    {
+        //       _artistService.UpsertArtist(artistViewModel, file);
+
+        //        TempData["success"] = "Artist created successfully";
+        //        return RedirectToAction("Index");
+        //    }
+        //    else
+        //    {
+        //        artistViewModel.AlbumList = _unitOfWork.Album.GetAll().Select(u => new SelectListItem
+        //        {
+        //            Text = u.AlbumTitle,
+        //            Value = u.Id.ToString()
+        //        });
+        //        return View(artistViewModel);
+        //    }
+        //}
+
+
         [Authorize(Roles = $"{Constants.Roles.Manager},{Constants.Roles.Administrator}")]
-        public IActionResult Upsert(Guid? id)
+        public IActionResult Create(Guid id)
         {
             ArtistViewModel artistViewModel = new()
             {
@@ -44,44 +97,68 @@ namespace MusicApp.Controllers
                 Artist = new Artist()
             };
 
-            if (id == null)
-            {
-                UpdateOrCreate = false;
-                return View(artistViewModel); // create new artist
-            }
-            else
-            {
-                artistViewModel.Artist = _artistService.GetArtist(id); // edit artist
-                UpdateOrCreate = true;
-                return View(artistViewModel);
-            }
+            return View(artistViewModel);
         }
         [HttpPost]
-        public IActionResult Upsert(ArtistViewModel artistViewModel, IFormFile? file)
+        [DisableRequestSizeLimit, RequestFormLimits(MultipartBodyLengthLimit = int.MaxValue,
+        ValueLengthLimit = int.MaxValue)]
+        public IActionResult Create(ArtistViewModel artistViewModel, IFormFile? file)
         {
-            if (UpdateOrCreate == true)
-            {
-                artistViewModel.UpdateOrCreate = true;
-            }
-
             if(ModelState.IsValid)
             {
-               _artistService.UpsertArtist(artistViewModel, file);
+                _artistService.CreateArtist(artistViewModel, file);
+                TempData["success"] = "Category was created successfully";
 
-                TempData["success"] = "Artist created successfully";
                 return RedirectToAction("Index");
             }
-            else
+
+            return RedirectToAction("Index");
+        }
+
+        [Authorize(Roles = $"{Constants.Roles.Manager},{Constants.Roles.Administrator}")]
+        public IActionResult Edit(Guid id)
+        {
+            if (id == Guid.Empty)
             {
-                artistViewModel.AlbumList = _unitOfWork.Album.GetAll().Select(u => new SelectListItem
+                return NotFound();
+            }
+
+            ArtistViewModel artistFromDb = new()
+            {
+                AlbumList = _unitOfWork.Album.GetAll().Select(u => new SelectListItem
                 {
                     Text = u.AlbumTitle,
                     Value = u.Id.ToString()
-                });
-                return View(artistViewModel);
-            }
-        }
+                }),
 
+                Artist = new Artist()
+            };
+
+            artistFromDb.Artist = _artistService.GetArtist(id);
+
+            if (artistFromDb == null)
+            {
+                return NotFound();
+            }
+
+            return View(artistFromDb);
+
+        }
+        [HttpPost]
+        [DisableRequestSizeLimit, RequestFormLimits(MultipartBodyLengthLimit = int.MaxValue,
+        ValueLengthLimit = int.MaxValue)]
+        public IActionResult Edit(ArtistViewModel artistViewModel, IFormFile? file)
+        {
+            if(ModelState.IsValid)
+            {
+                _artistService.UpdateArtist(artistViewModel, file);
+
+                TempData["success"] = "Album updated successfully";
+                return RedirectToAction("Index");
+            }
+
+            return View("Index");
+        }
 
         [Authorize(Roles = $"{Constants.Roles.Manager},{Constants.Roles.Administrator}")]
         public IActionResult Delete(Guid? id)
