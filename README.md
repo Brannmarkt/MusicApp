@@ -5,8 +5,9 @@ looking for a platform to upload their music or find new one from other people a
 <ul>
   <li>User Registration and Login: Users can create a new account or log in to an existing account
           using their email address and password. Once logged in, users are allowed to download music and manage their account.</li>
-  <li></li>
- 
+  <li>Add New Musician Page: Once logged in (and obtaining the necessary ), users can create a new artist/music band page that
+          includes things like description, images, discography and songs. The artists will be displayed on the main page</li>
+ <li></li>
   <li></li>
   <li>User Experience: The application has a clean and intuitive interface that makes it easy
           for users to manage their artist-page with music discography. The application's features are designed to
