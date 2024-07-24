@@ -9,7 +9,7 @@ looking for a platform to upload their music or find new one from other people a
         using their email address and password. Once logged in, users are allowed to download music and manage their account.
     </li>
     <li>
-        Add New Musician Page: Once logged in (and obtaining the necessary ), users can create a new artist/music band page that
+        Add New Musician Page: Once logged in (and obtaining the necessary permissions), users can create a new artist/music band page that
         includes things like description, images, discography and songs. The artists will be displayed on the main page.
     </li>
     <li>
