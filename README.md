@@ -17,7 +17,7 @@ looking for a platform to upload their music or find new one from other people a
         users keep their page updated by adding new albums/songs anytime.
     </li>
     <li>
-        View Other Users' Offers and Accounts: Users can view the offers and accounts of other users who have created an account
+        View Other Users' Pages and Accounts: Users can view the offers and accounts of other users who have created an account
         on the application. This feature allows users to find potential rentals and to connect with other users who may
         be interested in renting their home.
     </li>
