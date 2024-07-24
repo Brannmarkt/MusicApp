@@ -17,9 +17,8 @@ looking for a platform to upload their music or find new one from other people a
         users keep their page updated by adding new albums/songs anytime.
     </li>
     <li>
-        View Other Users' Pages and Accounts: Users can view the offers and accounts of other users who have created an account
-        on the application. This feature allows users to find potential rentals and to connect with other users who may
-        be interested in renting their home.
+        View Other Users' Pages and Accounts: Users can view the pages of other artists who have created an account
+        on the application. This feature allows users to find new music.
     </li>
     <li>
         User Experience: The application has a clean and intuitive interface that makes it easy
